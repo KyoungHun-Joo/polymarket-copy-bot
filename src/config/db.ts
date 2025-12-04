@@ -1,29 +1,28 @@
 import mongoose from 'mongoose';
 import { ENV } from './env';
-import { logger } from '../utils/logger';
+import chalk from 'chalk';
 
 const uri = ENV.MONGO_URI || 'mongodb://localhost:27017/polymarket_copytrading';
 
-const connectDB = async (): Promise<void> => {
+const connectDB = async () => {
     try {
         await mongoose.connect(uri);
-        logger.success('MongoDB connected successfully');
-        
-        // Handle connection events
-        mongoose.connection.on('error', (error) => {
-            logger.error('MongoDB connection error:', error);
-        });
-        
-        mongoose.connection.on('disconnected', () => {
-            logger.warn('MongoDB disconnected');
-        });
-        
-        mongoose.connection.on('reconnected', () => {
-            logger.info('MongoDB reconnected');
-        });
+        console.log(chalk.green('✓'), 'MongoDB connected');
     } catch (error) {
-        logger.error('MongoDB connection error:', error);
-        throw error;
+        console.log(chalk.red('✗'), 'MongoDB connection failed:', error);
+        process.exit(1);
+    }
+};
+
+/**
+ * Close MongoDB connection gracefully
+ */
+export const closeDB = async (): Promise<void> => {
+    try {
+        await mongoose.connection.close();
+        console.log(chalk.green('✓'), 'MongoDB connection closed');
+    } catch (error) {
+        console.log(chalk.red('✗'), 'Error closing MongoDB connection:', error);
     }
 };
 
