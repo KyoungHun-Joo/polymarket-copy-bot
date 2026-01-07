@@ -401,7 +401,6 @@ Once your bot is running successfully:
 - **[README.md](./README.md)** - Complete documentation
 - **[Quick Start Guide](./docs/QUICK_START.md)** - Alternative setup instructions
 - **[Multi-Trader Guide](./docs/MULTI_TRADER_GUIDE.md)** - Advanced multi-trader strategies
-- **[Docker Guide](./docs/DOCKER.md)** - Deploy with Docker
 - **[Simulation Guide](./docs/SIMULATION_GUIDE.md)** - Backtest before going live
 
 ---

@@ -86,21 +86,6 @@ The bot currently uses the **Polymarket Data API** to monitor trader activity an
 
 **📖 For complete configuration guide, see [Quick Start](./docs/QUICK_START.md)**
 
-## Docker Deployment
-
-Deploy with Docker Compose for a production-ready setup:
-
-```bash
-# Configure and start
-cp .env.example .env
-docker-compose up -d
-
-# View logs
-docker-compose logs -f polymarket
-```
-
-**📖 [Complete Docker Guide →](./docs/DOCKER.md)**
-
 ## Documentation
 
 ### Getting Started

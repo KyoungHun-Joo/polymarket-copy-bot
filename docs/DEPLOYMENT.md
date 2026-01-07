@@ -4,69 +4,14 @@ This guide covers deploying the Polymarket Copy Trading Bot to production enviro
 
 ## Prerequisites
 
-- Node.js 18+ or Docker
+- Node.js 18+
 - MongoDB database (local or MongoDB Atlas)
 - Polygon wallet with USDC and POL
 - RPC endpoint (Infura, Alchemy, or custom)
 
 ## Deployment Options
 
-### Option 1: Docker (Recommended)
-
-#### Using Docker Compose
-
-1. **Clone and configure:**
-
-```bash
-git clone <repository-url>
-cd polymarket-copy-trading-bot
-cp .env.example .env
-# Edit .env with your configuration
-```
-
-2. **Update MongoDB URI in .env:**
-
-```bash
-# For local MongoDB (docker-compose)
-MONGO_URI=mongodb://mongodb:27017/polymarket_copytrading
-
-# For MongoDB Atlas
-MONGO_URI=mongodb+srv://user:pass@cluster.mongodb.net/database
-```
-
-3. **Start services:**
-
-```bash
-docker-compose up -d
-```
-
-4. **View logs:**
-
-```bash
-docker-compose logs -f bot
-```
-
-5. **Stop services:**
-
-```bash
-docker-compose down
-```
-
-#### Using Docker Only
-
-```bash
-# Build image
-docker build -t polymarket-bot .
-
-# Run container
-docker run -d \
-  --name polymarket-bot \
-  --restart unless-stopped \
-  --env-file .env \
-  polymarket-bot
-```
-
-### Option 2: Direct Node.js Deployment
+### Direct Node.js Deployment
 
 #### On Linux Server (systemd)
 
@@ -167,7 +112,6 @@ chmod 600 .env
     - AWS Secrets Manager
     - HashiCorp Vault
     - Kubernetes Secrets
-    - Docker Secrets
 
 ## Health Checks
 
@@ -205,7 +149,6 @@ npm run health-check || echo "Health check failed!"
 
 ### Log Locations
 
-- **Docker:** `docker-compose logs bot`
 - **systemd:** `journalctl -u polymarket-bot`
 - **PM2:** `pm2 logs polymarket-bot`
 
@@ -234,18 +177,6 @@ mongodump --uri="mongodb://localhost:27017/polymarket_copytrading" --out=/backup
 
 # Restore
 mongorestore --uri="mongodb://localhost:27017/polymarket_copytrading" /backup/20240101
-```
-
-### Docker Volume Backup
-
-```bash
-# Backup MongoDB volume
-docker run --rm -v polymarket-copy-trading-bot_mongodb-data:/data -v $(pwd):/backup \
-  alpine tar czf /backup/mongodb-backup.tar.gz /data
-
-# Restore
-docker run --rm -v polymarket-copy-trading-bot_mongodb-data:/data -v $(pwd):/backup \
-  alpine tar xzf /backup/mongodb-backup.tar.gz -C /
 ```
 
 ## Scaling Considerations
@@ -332,9 +263,6 @@ npm run build
 3. **Restart:**
 
 ```bash
-# Docker
-docker-compose restart bot
-
 # systemd
 sudo systemctl restart polymarket-bot
 
