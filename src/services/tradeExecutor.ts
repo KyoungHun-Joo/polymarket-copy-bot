@@ -167,10 +167,20 @@ const doTrading = async (clobClient: ClobClient, trades: TradeWithUser[]) => {
             `https://data-api.polymarket.com/positions?user=${trade.userAddress}`
         );
         const my_position = my_positions.find(
-            (position: UserPositionInterface) => position.conditionId === trade.conditionId
+            (position: UserPositionInterface) =>
+                position.conditionId === trade.conditionId && position.asset === trade.asset
         );
+
+        if (trade.side === 'BUY' && my_position) {
+            Logger.info(
+                `Skipping BUY: already have ${my_position.outcome} position for this market`
+            );
+            return;
+        }
+
         const user_position = user_positions.find(
-            (position: UserPositionInterface) => position.conditionId === trade.conditionId
+            (position: UserPositionInterface) =>
+                position.conditionId === trade.conditionId && position.asset === trade.asset
         );
 
         // Get USDC balance
@@ -223,10 +233,19 @@ const doAggregatedTrading = async (clobClient: ClobClient, aggregatedTrades: Agg
             `https://data-api.polymarket.com/positions?user=${agg.userAddress}`
         );
         const my_position = my_positions.find(
-            (position: UserPositionInterface) => position.conditionId === agg.conditionId
+            (position: UserPositionInterface) =>
+                position.conditionId === agg.conditionId && position.asset === agg.asset
         );
+
+        if (agg.side === 'BUY' && my_position) {
+            Logger.info(
+                `Skipping BUY: already have ${my_position.outcome} position for this market`
+            );
+            return;
+        }
         const user_position = user_positions.find(
-            (position: UserPositionInterface) => position.conditionId === agg.conditionId
+            (position: UserPositionInterface) =>
+                position.conditionId === agg.conditionId && position.asset === agg.asset
         );
 
         // Get USDC balance

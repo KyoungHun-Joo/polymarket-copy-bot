@@ -167,12 +167,19 @@ const postOrder = async (
     } else if (condition === 'buy') {
         //Buy strategy
         Logger.info('Executing BUY strategy...');
+        if (my_position) {
+            Logger.warning(
+                `Already have ${my_position.outcome} position for this market - skipping BUY`
+            );
+            await UserActivity.updateOne({ _id: trade._id }, { bot: true });
+            return;
+        }
 
         Logger.info(`Your balance: $${my_balance.toFixed(2)}`);
         Logger.info(`Trader bought: $${trade.usdcSize.toFixed(2)}`);
 
         // Get current position size for position limit checks
-        const currentPositionValue = my_position ? my_position.size * my_position.avgPrice : 0;
+        const currentPositionValue = 0;
 
         // Use new copy strategy system
         const orderCalc = calculateOrderSize(
