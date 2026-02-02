@@ -367,9 +367,9 @@ const tradeExecutor = async (clobClient: ClobClient) => {
                 await doTrading(clobClient, trades);
                 lastCheck = Date.now();
             } else {
-                // Update waiting message every 300ms for smooth animation
-                if (Date.now() - lastCheck > 300) {
-                    Logger.waiting(USER_ADDRESSES.length);
+                // Update waiting message every 1000ms for smooth animation
+                if (Date.now() - lastCheck > 5 * 60 * 1000) {
+                    //Logger.waiting(USER_ADDRESSES.length);
                     lastCheck = Date.now();
                 }
             }
