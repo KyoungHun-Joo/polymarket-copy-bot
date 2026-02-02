@@ -2,6 +2,7 @@ import { ethers } from 'ethers';
 import { AssetType, ClobClient, OrderType, Side } from '@polymarket/clob-client';
 import { SignatureType } from '@polymarket/order-utils';
 import { ENV } from '../config/env';
+import { getOrderBookSafe } from '../utils/getOrderBookSafe';
 
 const PROXY_WALLET = ENV.PROXY_WALLET;
 const PRIVATE_KEY = ENV.PRIVATE_KEY;
@@ -124,7 +125,12 @@ const sellPosition = async (clobClient: ClobClient, position: Position, sellSize
     while (remaining > 0 && retry < RETRY_LIMIT) {
         try {
             // Get current order book
-            const orderBook = await clobClient.getOrderBook(position.asset);
+            const orderBook = await getOrderBookSafe(clobClient, position.asset, (message) => {
+                console.log(`❌ Order book unavailable: ${message}`);
+            });
+            if (!orderBook) {
+                break;
+            }
 
             if (!orderBook.bids || orderBook.bids.length === 0) {
                 console.log('❌ No bids available in order book');

@@ -1,5 +1,6 @@
 import { AssetType, ClobClient, OrderType, Side } from '@polymarket/clob-client';
 import { ENV } from '../config/env';
+import { getOrderBookSafe } from '../utils/getOrderBookSafe';
 import createClobClient from '../utils/createClobClient';
 import fetchData from '../utils/fetchData';
 
@@ -110,7 +111,12 @@ const sellEntirePosition = async (
     await updatePolymarketCache(clobClient, position.asset);
 
     while (remaining >= MIN_SELL_TOKENS && attempts < RETRY_LIMIT) {
-        const orderBook = await clobClient.getOrderBook(position.asset);
+        const orderBook = await getOrderBookSafe(clobClient, position.asset, (message) => {
+            console.log(`   ❌ Order book unavailable: ${message}`);
+        });
+        if (!orderBook) {
+            break;
+        }
 
         if (!orderBook.bids || orderBook.bids.length === 0) {
             console.log('   ❌ Order book has no bids – liquidity unavailable');

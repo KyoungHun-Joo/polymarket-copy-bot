@@ -3,6 +3,7 @@ import { ENV } from '../config/env';
 import { UserActivityInterface, UserPositionInterface } from '../interfaces/User';
 import { getUserActivityModel } from '../models/userHistory';
 import Logger from './logger';
+import { getOrderBookSafe } from './getOrderBookSafe';
 import { calculateOrderSize, getTradeMultiplier } from '../config/copyStrategy';
 
 const RETRY_LIMIT = ENV.RETRY_LIMIT;
@@ -96,7 +97,13 @@ const postOrder = async (
         let retry = 0;
         let abortDueToFunds = false;
         while (remaining > 0 && retry < RETRY_LIMIT) {
-            const orderBook = await clobClient.getOrderBook(trade.asset);
+            const orderBook = await getOrderBookSafe(clobClient, trade.asset, (message) => {
+                Logger.warning(`Order book unavailable: ${message}`);
+            });
+            if (!orderBook) {
+                await UserActivity.updateOne({ _id: trade._id }, { bot: true });
+                break;
+            }
             if (!orderBook.bids || orderBook.bids.length === 0) {
                 Logger.warning('No bids available in order book');
                 await UserActivity.updateOne({ _id: trade._id }, { bot: true });
@@ -209,7 +216,13 @@ const postOrder = async (
         let totalBoughtTokens = 0; // Track total tokens bought for this trade
 
         while (remaining > 0 && retry < RETRY_LIMIT) {
-            const orderBook = await clobClient.getOrderBook(trade.asset);
+            const orderBook = await getOrderBookSafe(clobClient, trade.asset, (message) => {
+                Logger.warning(`Order book unavailable: ${message}`);
+            });
+            if (!orderBook) {
+                await UserActivity.updateOne({ _id: trade._id }, { bot: true });
+                break;
+            }
             if (!orderBook.asks || orderBook.asks.length === 0) {
                 Logger.warning('No asks available in order book');
                 await UserActivity.updateOne({ _id: trade._id }, { bot: true });
@@ -404,7 +417,13 @@ const postOrder = async (
         let totalSoldTokens = 0; // Track total tokens sold
 
         while (remaining > 0 && retry < RETRY_LIMIT) {
-            const orderBook = await clobClient.getOrderBook(trade.asset);
+            const orderBook = await getOrderBookSafe(clobClient, trade.asset, (message) => {
+                Logger.warning(`Order book unavailable: ${message}`);
+            });
+            if (!orderBook) {
+                await UserActivity.updateOne({ _id: trade._id }, { bot: true });
+                break;
+            }
             if (!orderBook.bids || orderBook.bids.length === 0) {
                 await UserActivity.updateOne({ _id: trade._id }, { bot: true });
                 Logger.warning('No bids available in order book');
