@@ -352,7 +352,7 @@ const tradeExecutor = async (clobClient: ClobClient) => {
                             `${bufferedCount} trade group(s) pending`
                         );
                     } else {
-                        Logger.waiting(USER_ADDRESSES.length);
+                        // Logger.waiting(USER_ADDRESSES.length);
                     }
                     lastCheck = Date.now();
                 }
